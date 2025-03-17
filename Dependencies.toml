@@ -354,7 +354,7 @@ modules = [
 ]
 
 [[package]]
-org = "sameerag"
+org = "wso2"
 name = "hospital_connect"
 version = "0.1.0"
 dependencies = [
@@ -364,6 +364,6 @@ dependencies = [
 	{org = "ballerinax", name = "health.fhir.r4utils.ccdatofhir"}
 ]
 modules = [
-	{org = "sameerag", packageName = "hospital_connect", moduleName = "hospital_connect"}
+	{org = "wso2", packageName = "hospital_connect", moduleName = "hospital_connect"}
 ]
 
