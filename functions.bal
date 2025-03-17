@@ -9,7 +9,7 @@ function getFhirResourcesFromCcda(xml ccdaDocument, string resourceType, string 
     }
     r4:BundleEntry[] entries = fhirBundle.entry ?: [];
     r4:BundleEntry[] fhirBundleEntryArr = [];
-    r4:Bundle fhirBundleResult = {entry: fhirBundleEntryArr, 'type: "document"};
+    r4:Bundle fhirBundleResult = {entry: fhirBundleEntryArr, 'type: "searchset"};
     foreach var entry in entries {
         if resourceType == "Patient" && entry?.'resource is international401:Patient {
             international401:Patient patient = check entry?.'resource.cloneWithType();
