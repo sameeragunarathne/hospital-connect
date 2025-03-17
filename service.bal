@@ -6,7 +6,7 @@ final http:Client ccdaClient = check new (ccdaEndpoint);
 service /fhir/r4 on new http:Listener(servicePort) {
 
     // Create a new patient
-    resource function post Patient(@http:Payload r4:DomainResource payload) returns r4:Resource|error {
+    resource function post Patient(@http:Payload json payload) returns r4:Resource|error {
         r4:OperationOutcome operationOutcome = {issue: [{severity: "information", code: "informational", diagnostics: "Not implemented"}]};
         return operationOutcome;
     }
@@ -26,7 +26,7 @@ service /fhir/r4 on new http:Listener(servicePort) {
     }
 
     // Read specific version of patient
-    resource function get Patient/[string id]/_history/[string vid]() returns r4:DomainResource|error {
+    resource function get Patient/[string id]/_history/[string vid]() returns r4:Resource|error {
         r4:OperationOutcome operationOutcome = {issue: [{severity: "information", code: "informational", diagnostics: "Not implemented"}]};
         return operationOutcome;
     }
@@ -38,7 +38,7 @@ service /fhir/r4 on new http:Listener(servicePort) {
     }
 
     // Create a new condition
-    resource function post Condition(@http:Payload r4:Resource payload) returns r4:Resource|error {
+    resource function post Condition(@http:Payload json payload) returns r4:Resource|error {
         r4:OperationOutcome operationOutcome = {issue: [{severity: "information", code: "informational", diagnostics: "Not implemented"}]};
         return operationOutcome;
     }
@@ -88,7 +88,7 @@ service /fhir/r4 on new http:Listener(servicePort) {
     }
 
     // Create a new allergy intolerance
-    resource function post AllergyIntolerance(@http:Payload r4:DomainResource payload) returns r4:DomainResource|error {
+    resource function post AllergyIntolerance(@http:Payload json payload) returns r4:Resource|error {
         r4:OperationOutcome operationOutcome = {issue: [{severity: "information", code: "informational", diagnostics: "Not implemented"}]};
         return operationOutcome;
     }
