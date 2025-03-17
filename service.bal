@@ -45,11 +45,16 @@ service /fhir/r4 on new http:Listener(servicePort) {
 
     // Read condition by ID
     resource function get Condition/[string id]() returns json|error {
-        xml|error ccdaResponse = check ccdaClient->/patients/ccda;
+        if !id.startsWith("cnd-") {
+            r4:OperationOutcome operationOutcome = {issue: [{severity: "error", code: "processing", diagnostics: "Invalid ID"}]};
+            return operationOutcome.toJson();
+        }
+        string patient = id.substring(4);
+        xml|error ccdaResponse = check ccdaClient->/patients/[patient]/ccda;
         if ccdaResponse is error {
             return error("Failed to retrieve CCDA data");
         }
-        r4:Resource|error fhirResourcesFromCcda = getFhirResourcesFromCcda(ccdaResponse, "Condition", (), id);
+        r4:Resource|error fhirResourcesFromCcda = getFhirResourcesFromCcda(ccdaResponse, "Condition", patient, id);
         if fhirResourcesFromCcda is r4:Resource {
             return fhirResourcesFromCcda.toJson();
         }
@@ -95,12 +100,17 @@ service /fhir/r4 on new http:Listener(servicePort) {
 
     // Read allergy intolerance by ID
     resource function get AllergyIntolerance/[string id]() returns json|error {
-        xml|error ccdaResponse = check ccdaClient->/patients/ccda;
+        if !id.startsWith("alg-") {
+            r4:OperationOutcome operationOutcome = {issue: [{severity: "error", code: "processing", diagnostics: "Invalid ID"}]};
+            return operationOutcome.toJson();
+        }
+        string patient = id.substring(4);
+        xml|error ccdaResponse = check ccdaClient->/patients/[patient]/ccda;
         if ccdaResponse is error {
             r4:OperationOutcome operationOutcome = {issue: [{severity: "error", code: "processing", diagnostics: "Failed to retrieve CCDA data"}]};
             return operationOutcome.toJson();
         }
-        r4:Resource|error fhirResourcesFromCcda = getFhirResourcesFromCcda(ccdaResponse, "AllergyIntolerance", (), id);
+        r4:Resource|error fhirResourcesFromCcda = getFhirResourcesFromCcda(ccdaResponse, "AllergyIntolerance", patient, id);
         if fhirResourcesFromCcda is r4:Resource {
             return fhirResourcesFromCcda.toJson();
         }
