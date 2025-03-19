@@ -1,6 +1,7 @@
 import ballerinax/health.fhir.r4 as r4;
 import ballerinax/health.fhir.r4.international401 as international401;
 import ballerinax/health.fhir.r4utils.ccdatofhir as ccdatofhir;
+import ballerina/lang.regexp;
 
 function getFhirResourcesFromCcda(xml ccdaDocument, string resourceType, string patientId, string? resourceId = ()) returns r4:Resource|error {
     r4:Bundle|error fhirBundle = ccdatofhir:ccdaToFhir(ccdaDocument);
@@ -10,6 +11,7 @@ function getFhirResourcesFromCcda(xml ccdaDocument, string resourceType, string 
     r4:BundleEntry[] entries = fhirBundle.entry ?: [];
     r4:BundleEntry[] fhirBundleEntryArr = [];
     r4:Bundle fhirBundleResult = {entry: fhirBundleEntryArr, 'type: "searchset"};
+    int resourceCount = 0;
     foreach var entry in entries {
         r4:Resource resourceContent = check entry?.'resource.cloneWithType();
         string extractedResourceType = resourceContent.resourceType;
@@ -24,7 +26,12 @@ function getFhirResourcesFromCcda(xml ccdaDocument, string resourceType, string 
                 allergyIntolerance.id = resourceId;
                 return allergyIntolerance;
             } else {
-                allergyIntolerance.id = string `alg-${patientId}`;
+                resourceCount += 1;
+                if entries.length() > 1 {
+                    allergyIntolerance.id = string `alg-${resourceCount}-${patientId}`;
+                } else {
+                    allergyIntolerance.id = string `alg-${patientId}`;
+                }
             }
             fhirBundleEntryArr.push({'resource: allergyIntolerance});
         } else if resourceType == "Condition" && resourceType == extractedResourceType {
@@ -34,7 +41,12 @@ function getFhirResourcesFromCcda(xml ccdaDocument, string resourceType, string 
                 condition.id = resourceId;
                 return condition;
             } else {
-                condition.id = string `cnd-${patientId}`;
+                resourceCount += 1;
+                if entries.length() > 1 {
+                    condition.id = string `cnd-${resourceCount}-${patientId}`;
+                } else {
+                    condition.id = string `cnd-${patientId}`;
+                }
             }
             fhirBundleEntryArr.push({'resource: condition});
         } else if resourceType == "MedicationRequest" && resourceType == extractedResourceType {
@@ -44,10 +56,27 @@ function getFhirResourcesFromCcda(xml ccdaDocument, string resourceType, string 
                 medicationRequest.id = resourceId;
                 return medicationRequest;
             } else {
-                medicationRequest.id = string `med-${patientId}`;
+                resourceCount += 1;
+                if entries.length() > 1 {
+                    medicationRequest.id = string `med-${resourceCount}-${patientId}`;
+                } else {
+                    medicationRequest.id = string `med-${patientId}`;
+                }
             }
             fhirBundleEntryArr.push({'resource: medicationRequest});
         } 
     }
     return fhirBundleResult;
+}
+
+function extractPatientId(string prefix, string id) returns string|error {
+    if id.startsWith(prefix) {
+        string[] parts = regexp:split(re `-`, id.substring(4));
+        if parts.length() == 2 {
+            return parts[1];
+        } else if parts.length() == 3 {
+            return parts[2];
+        }
+    }
+    return error("Invalid Resource ID format");
 }

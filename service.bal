@@ -49,7 +49,7 @@ service /fhir/r4 on new http:Listener(servicePort) {
             r4:OperationOutcome operationOutcome = {issue: [{severity: "error", code: "processing", diagnostics: "Invalid ID"}]};
             return operationOutcome.toJson();
         }
-        string patient = id.substring(4);
+        string patient = check extractPatientId("cnd-", id);
         xml|error ccdaResponse = check ccdaClient->/patients/[patient]/ccda;
         if ccdaResponse is error {
             return error("Failed to retrieve CCDA data");
@@ -104,7 +104,7 @@ service /fhir/r4 on new http:Listener(servicePort) {
             r4:OperationOutcome operationOutcome = {issue: [{severity: "error", code: "processing", diagnostics: "Invalid ID"}]};
             return operationOutcome.toJson();
         }
-        string patient = id.substring(4);
+        string patient = check extractPatientId("alg-", id);
         xml|error ccdaResponse = check ccdaClient->/patients/[patient]/ccda;
         if ccdaResponse is error {
             r4:OperationOutcome operationOutcome = {issue: [{severity: "error", code: "processing", diagnostics: "Failed to retrieve CCDA data"}]};
@@ -161,7 +161,7 @@ service /fhir/r4 on new http:Listener(servicePort) {
             r4:OperationOutcome operationOutcome = {issue: [{severity: "error", code: "processing", diagnostics: "Invalid ID"}]};
             return operationOutcome.toJson();
         }
-        string patient = id.substring(4);
+        string patient = check extractPatientId("med-", id);
         xml|error ccdaResponse = check ccdaClient->/patients/[patient]/ccda;
         if ccdaResponse is error {
             r4:OperationOutcome operationOutcome = {issue: [{severity: "error", code: "processing", diagnostics: "Failed to retrieve CCDA data"}]};
